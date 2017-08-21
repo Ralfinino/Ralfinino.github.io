@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Przykład 56 - Praca z klasami CSS</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js">
+</script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<style>
+
+/* 
+   notetoself.css
+
+Testowane w: Firefox4RC, Safari 5, Opera 11, Chrome 10
+Przejście (ease-in) nie działa w Firefox 3.
+
+*/
+
+
+body {
+  background-color: #dbdbdb;
+  font-size: 100%;
+}
+
+form input#note_text {
+  width: 350px;
+}
+
+/* notatka */
+
+ul#stickies li {
+  display: block;
+  list-style: none;
+  z-index: 1;
+  float: left; 
+  margin: 30px;
+  padding: 15px 15px 50px 15px;
+  width: 200px;
+  height: 200px;
+  border: 1px solid #bfbfbf;
+    background-color: LightGoldenRodYellow;  /* wpisz #fafad2, jeśli nazwa koloru nie działa */
+  color: black;
+  text-decoration: none;
+  -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  -o-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  -webkit-transition: all 0.5s ease-in;
+  -moz-transition: all 0.5s ease-in;
+  -o-transition: all 0.5s ease-in;
+  -ms-transition: all 0.5s ease-in;
+  transition: all 0.5s ease-in;
+  overflow: hidden;
+} 
+
+ul#stickies li span.sticky {
+  font-family: Verdana, Helvetica, sans-serif;
+  font-size: 200%;
+}
+
+/* 
+ * obrót
+ */
+ul#stickies li:nth-child(even) {
+  -webkit-transform: rotate(2deg);
+  -moz-transform: rotate(2deg);
+  -o-transform: rotate(2deg);
+  -ms-transform: rotate(2deg);
+  transform: rotate(2deg);
+}
+
+ul#stickies li:nth-child(odd) {
+  -webkit-transform: rotate(-1deg);
+  -moz-transform: rotate(-1deg);
+  -o-transform: rotate(-1deg);
+  -ms-transform: rotate(-1deg);
+  transform: rotate(-1deg);
+}
+
+ul#stickies li:nth-child(3n) {
+  -webkit-transform: rotate(1deg);
+  -moz-transform: rotate(1deg);
+  -o-transform: rotate(1deg);
+  -ms-transform: rotate(1deg);
+  transform: rotate(1deg);
+}
+
+/* 
+   Przykład przekształcenia 
+   Korzysta z przekształcenia zdefiniowanego powyżej do spowolnienia ruchu.
+*/
+ul#stickies li:hover {
+  -webkit-box-shadow: 5px 5px 6px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 5px 5px 6px rgba(0, 0, 0, 0.4);
+  -o-box-shadow: 5px 5px 6px rgba(0, 0, 0, 0.4);
+  -webkit-transform: rotate(0deg) scale(1.25);
+  -moz-transform: rotate(0deg) scale(1.25);
+  -o-transform: rotate(0deg) scale(1.25);
+  -ms-transform: rotate(0deg) scale(1.25);
+  transform: rotate(0deg) scale(1.25);
+  z-index: 10;
+}
+
+
+
+
+</style>
+
+</head>
+<body>
+
+<form>
+
+<input type="text" id="note_text">
+
+<input type="button" id="add_button" value="dodaj notatkę">
+
+<input type="button" id="clear_button" value="wyczyść">
+
+</form>
+
+<ul id="stickies">
+</ul>
+
+<script>
+
+/*localStorage.setItem('sticky_0','zrobić kupę');
+localStorage.setItem('sticky_1','zjeść pizze');*/
+
+var button = document.getElementById('add_button');
+button.onclick = createSticky;
+
+var stickiesArray =getStickiesArray();
+
+for(var i =0;i<stickiesArray.length;i++){
+  var key = stickiesArray[i];
+  var value = localStorage[key];
+  addStickyToDOM(value);
+}
+
+function addStickyToDOM(value){
+  var stickies = document.getElementById('stickies');
+  var sticky = document.createElement('li');
+  var span = document.createElement('span');
+  span.setAttribute('class','sticky');
+  span.innerHTML = value;
+  sticky.appendChild(span);
+  stickies.appendChild(sticky);
+}
+
+function createSticky(){
+  var currentDate = new Date();
+  var time = currentDate.getTime();
+  var key = "sticky_"+time;
+  var stickiesArray = getStickiesArray();
+  stickiesArray.push(key);
+  var value = document.getElementById('note_text').value;
+  localStorage.setItem('stickiesArray',JSON.stringify(stickiesArray));
+  addStickyToDOM(value);
+}
+
+window.onload = function(){
+  var clearButton = document.getElementById('clear_button');
+  clearButton.onclick = clearStorage;
+}
+
+function clearStorage(){
+  localStorage.clear();
+}
+
+function getStickiesArray(){
+  var stickiesArray = localStorage.getItem('stickiesArray');
+  if(!stickiesArray){
+    stickiesArray = [];
+    localStorage.setItem('stickiesArray',JSON.stringify(stickiesArray));
+  } else {
+    stickiesArray = JSON.parse(stickiesArray);
+  }
+  return stickiesArray;
+}
+
+function deleteSticky(key){
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
