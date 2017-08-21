@@ -20,7 +20,7 @@
 
 	if(empty($errors)===true){
 		mail('rafzasada@gmail.com','Contact form',$message,'From: '.$email);
-		header('Location: form.php?sent');
+		header('Location: index.php?sent');
 		exit();
 	}	
 
